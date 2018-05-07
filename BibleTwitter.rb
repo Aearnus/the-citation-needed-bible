@@ -6,6 +6,14 @@ require "json"
 
 $BIBLE_BOOK_REGEX = /(.+?)(\d?)\s?(\w{2,}|Acts of the \w{2,}|Song of \w{2,})+\.?\s?(\d{1,2}):(\d{1,2})(.+)/i
 
+def sort_child_hash_by_key(hash)
+    return hash.map do |key, value| 
+        {key => value.sort_by{|k,v| k.to_i}.to_h} 
+    end.reduce do |left, right| 
+        left.merge(right) 
+    end
+end
+
 class BibleTwitter
     attr_accessor :client
     
@@ -19,12 +27,17 @@ class BibleTwitter
     end
     
     def performSearch()
-        return @client.search("bible OR quote OR love OR jesus OR strength OR inspirational OR #bible OR #citationneededbible OR #thecitationneededbible -filter:retweets", result_type: "recent", count: 20)
+        puts "Connecting to the Twitter API..."
+        out = @client.search("bible OR quote OR jesus OR strength OR inspirational OR #bible OR #citationneededbible OR #thecitationneededbible -filter:retweets -filter:replies", result_type: "recent", count: 50)
+        puts "Completed Twitter API search, got #{out.to_a.length} tweets."
+        return out
     end
     
     def self.filterTweet(tweet)
+        puts "Filtering tweet #{tweet.text}..."
         tweet_matches = tweet.text.match($BIBLE_BOOK_REGEX)
         if !tweet_matches.nil?
+            puts "This tweet matches the regex."
             return {
                 text: tweet_matches[0],
                 before: tweet_matches[1],
@@ -35,6 +48,7 @@ class BibleTwitter
                 after: tweet_matches[6]
             }
         end
+        puts "This tweet does not match the regex."
         return nil
     end
     
@@ -78,14 +92,17 @@ class BibleTwitter
             db[bookName][chapterName][verseName] = verseText
             puts "The book #{bookName}, chapter #{chapterName} and verse #{verseName}: #{verseText}"
         end
+        # recursively sort the db by key
+        # ...trust me
+        db = sort_child_hash_by_key(db)
+        db = db.map do |bookName, book|
+            {bookName => sort_child_hash_by_key(book)}
+        end.reduce do |left, right| 
+            left.merge(right) 
+        end
+        
         File.open("db.json", "w") do |f|
             f.write(JSON.generate(db))
         end
     end
-end
-
-if __FILE__ == $0
-    puts "Updating database..."
-    bibleTwitter = BibleTwitter.new()
-    bibleTwitter.updateDatabase()
 end

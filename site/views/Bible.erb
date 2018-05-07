@@ -7,8 +7,15 @@
         body {
             margin: 0 auto;
             max-width: 36em;
+            width: 36em;
             font-family: sans-serif;
             padding: 4em;
+        }
+        .logo {
+            box-sizing: border-box;
+            width: inherit;
+            background-color: #222;
+            padding: 2em;
         }
         .verse-name {
             font-size: 0.5em;
@@ -16,7 +23,7 @@
         }
     </style>
     <body>
-        <img src="logo.png"/>
+        <img class="logo" src="CitationNeededBible-Vertical.svg.png"/>
         <% db.each do |bookName, book| %> 
             <h2>The Book of <%= CGI::escapeHTML(bookName) %></h2>
             <% book.each do |chapterName, chapter| %> 
