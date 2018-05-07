@@ -1,0 +1,30 @@
+
+<html>
+    <head>
+        <title>The [Citation Needed] Bible</title>
+    </head>
+    <style>
+        body {
+            margin: 0 auto;
+            max-width: 36em;
+            font-family: sans-serif;
+            padding: 4em;
+        }
+        .verse-name {
+            font-size: 0.5em;
+            color: grey;
+        }
+    </style>
+    <body>
+        <img src="logo.png"/>
+        <% db.each do |bookName, book| %> 
+            <h2>The Book of <%= CGI::escapeHTML(bookName) %></h2>
+            <% book.each do |chapterName, chapter| %> 
+                <h3>Chapter <%= CGI::escapeHTML(chapterName) %></h3>
+                <% chapter.each do |verseName, verse| %> 
+                    <span><%= CGI::escapeHTML(verse) %><span class="verse-name"><%= CGI::escapeHTML(verseName) %></span></span>
+                <% end %> 
+            <% end %> 
+        <% end %> 
+    </body>
+</html>
