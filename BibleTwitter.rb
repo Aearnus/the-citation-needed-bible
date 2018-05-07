@@ -4,7 +4,7 @@ require_relative "Credentials.rb"
 require "twitter"
 require "json"
 
-$BIBLE_BOOK_REGEX = /(.+?)(\d?)\s?(\w{2,}|Acts of the \w{2,}|Song of \w{2,})+\.?\s?(\d{1,2}):(\d{1,2})(.+)/i
+$BIBLE_BOOK_REGEX = /(\d?)\s?(\S{2,}|Acts of the \S{2,}|Song of \S{2,})\s?(\d{1,2}):(\d{1,2})/i
 
 def sort_child_hash_by_key(hash)
     return hash.map do |key, value| 
@@ -39,13 +39,13 @@ class BibleTwitter
         if !tweet_matches.nil?
             puts "This tweet matches the regex."
             return {
-                text: tweet_matches[0],
-                before: tweet_matches[1],
-                book_num: tweet_matches[2],
-                book: tweet_matches[3],
-                chapter: tweet_matches[4],
-                verse: tweet_matches[5],
-                after: tweet_matches[6]
+		text: tweet_matches.string,
+		before: tweet_matches.pre_match,
+                book_num: tweet_matches[1],
+                book: tweet_matches[2],
+                chapter: tweet_matches[3],
+                verse: tweet_matches[4],
+		after: tweet_matches.post_match
             }
         end
         puts "This tweet does not match the regex."
