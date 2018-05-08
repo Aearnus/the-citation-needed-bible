@@ -39,13 +39,13 @@ class BibleTwitter
         if !tweet_matches.nil?
             puts "This tweet matches the regex."
             return {
-		text: tweet_matches.string,
-		before: tweet_matches.pre_match,
+		        text: tweet_matches.string,
+		        before: tweet_matches.pre_match,
                 book_num: tweet_matches[1],
                 book: tweet_matches[2],
                 chapter: tweet_matches[3],
                 verse: tweet_matches[4],
-		after: tweet_matches.post_match
+		        after: tweet_matches.post_match
             }
         end
         puts "This tweet does not match the regex."
@@ -61,6 +61,32 @@ class BibleTwitter
             end
         end
         return out
+    end
+    
+    def self.expandAcronym(bookAcronym)
+        return bookAcronym
+    end
+    
+    def self.cleanBookName(bookName)
+        #remove all non-letters or whitespace
+        bookName = bookName.gsub(/[^\w\s]/, " ")
+        #ensure there is exactly one space between the number and the number and the name
+        bookMatch = bookName.match(/(\d?)\s*(\w+)/)
+        if (bookMatch.nil?)
+            puts "Found book name exception: #{bookName}"
+            # most of these are empty, so for shits and giggles, we'll make it book Null
+            # how these get into the DB? i have no idea and this is too dumb of a project to care
+            bookName = "Null"
+        else 
+            if bookMatch[1].empty?
+                bookName = BibleTwitter::expandAcronym(bookMatch[2])
+            else
+                bookName = "#{bookMatch[1]} #{BibleTwitter::expandAcronym(bookMatch[2])}"
+            end
+        end
+        #ensure that every space is only 1 space, and capitalize every word
+        bookName = bookName.split(?\ ).map(&:capitalize).join(?\ )
+        return bookName
     end
     
     def updateDatabase()
