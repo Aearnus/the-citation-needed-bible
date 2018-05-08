@@ -84,7 +84,7 @@ class BibleTwitter
     
     def performSearch()
         puts "Connecting to the Twitter API..."
-        out = @client.search("bible OR quote OR jesus OR strength OR inspirational OR #bible OR #citationneededbible OR #thecitationneededbible -filter:retweets -filter:replies -filter:links", result_type: "recent", count: 100)
+        out = @client.search("bible OR quote OR jesus OR strength OR inspirational OR #bible OR #citationneededbible OR #thecitationneededbible -filter:retweets -filter:replies -filter:links", result_type: "recent", count: 25)
         puts "Completed Twitter API search, got #{out.to_a.length} tweets."
         return out
     end

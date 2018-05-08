@@ -11,6 +11,16 @@
             font-family: sans-serif;
             padding: 4em;
         }
+        *:target {
+            background-color: #ffff9b;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        a:hover, a:hover h2, a:hover h3 {
+            background-color: #ccc;
+        }
         .logo {
             box-sizing: border-box;
             width: inherit;
@@ -25,11 +35,24 @@
     <body>
         <img class="logo" src="CitationNeededBible-Vertical.svg.png"/>
         <% db.each do |bookName, book| %> 
-            <h2>The Book of <%= CGI::escapeHTML(bookName) %></h2>
+            <% bookNameId = "book-#{CGI::escapeHTML(bookName).gsub(/\s/, "-")}" %>
+            <a href="#<%= bookNameId %>">
+                <h2 id="<%= bookNameId %>">
+                    The Book of <%= CGI::escapeHTML(bookName) %>
+                </h2>
+            </a>
             <% book.each do |chapterName, chapter| %> 
-                <h3>Chapter <%= CGI::escapeHTML(chapterName) %></h3>
+                <% chapterNameId = "chapter-#{CGI::escapeHTML(chapterName)}" %>
+                <a href="#<%= bookNameId %>-<%= chapterNameId %>">
+                    <h3 id="<%= bookNameId %>-<%= chapterNameId %>">
+                        Chapter <%= CGI::escapeHTML(chapterName) %>
+                    </h3>
+                </a>
                 <% chapter.each do |verseName, verse| %> 
-                    <span><%= CGI::escapeHTML(verse) %><span class="verse-name"><%= CGI::escapeHTML(verseName) %></span></span>
+                    <% verseNameId = "verse-#{CGI::escapeHTML(verseName)}" %>
+                    <a href="#<%= bookNameId %>-<%= chapterNameId %>-<%= verseNameId %>">
+                        <span id="<%= bookNameId %>-<%= chapterNameId %>-<%= verseNameId %>"><%= CGI::escapeHTML(verse) %><span class="verse-name"><%= CGI::escapeHTML(verseName) %></span></span>
+                    </a>
                 <% end %> 
             <% end %> 
         <% end %> 
