@@ -5,6 +5,62 @@ require "twitter"
 require "json"
 
 $BIBLE_BOOK_REGEX = /(\d?)\s?(\S{2,}|Acts of the \S{2,}|Song of \S{2,})\s?(\d{1,2}):(\d{1,2})/i
+$BIBLE_ACRONYMS = {
+    # Old testament
+    /Gen|Ge|Gn/i => "Genesis",
+    /Ex|Exod|Exo/i => "Exodus",
+    /Lev|Le|Lv/i => "Leviticus",
+    /Num|Nu|Nm|Nb/i => "Numbers",
+    /Deut|De|Dt/i => "Deuteronomy",
+    /Chron|Chr|Ch/i => "Chronicles",
+    /Ezr|Ez/i => "Ezra",
+    /Neh|Ne/i => "Nehemiah",
+    /Est|Esth|Es/i => "Esther",
+    /Jb/i => "Job",
+    /Ps|Psal|Pslm|Psa|Psm|Pss/i => "Psalms",
+    /Prov|Pro|Prv|Pr/i => "Proverbs",
+    /Eccles|Eccle|Ecc|Ec|Qoh/i => "Ecclesiastes",
+    /Song|SOS|So|Cant/i => "Song of Solomon",
+    /Isa|Is/i => "Isaiah",
+    /Jer|Je|Jr/i => "Jeremiah",
+    /Lam|La/i => "Lamentations",
+    /Ezek|Eze|Ezk/i => "Ezekiel",
+    /Dan|Da|Dn/i => "Daniel",
+    /Hos|Ho/i => "Hosea",
+    /Jl/i => "Joel",
+    /Am/i => "Amos",
+    /Obad|Ob/i => "Obadiah",
+    /Jnh|Jon/i => "Jonah",
+    /Mic|Mc/i => "Micah",
+    /Nah|Na/i => "Nahum",
+    /Hab|Hb/i => "Habakkuk",
+    /Zeph|Zep|Zp/i => "Zephaniah",
+    /Hag|Hg/i => "Haggai",
+    /Zech|Zec|Zc/i => "Zechariah",
+    /Mal|Ml/i => "Malachi",
+    # New testament
+    /Matt|Mt/i => "Matthew",
+    /Mrk|Mar|Mk|Mr/i => "Mark",
+    /Luk|Lk/i => "Luke",
+    /Joh|Jhn|Jn/i => "John",
+    /Act|Ac/i => "Acts",
+    /Rom|Ro|Rm/i => "Romans",
+    /Cor|Co/i => "Corinthians",
+    /Gal|Ga/i => "Galatians",
+    /Eph|Ephes/i => "Ephesians",
+    /Phil|Php|Pp/i => "Philippians",
+    /Col|Co/i => "Colossians",
+    /Thess|Thes|Th/i => "Thessalonians",
+    /Tim|Ti/i => "Timothy",
+    /Tit/i => "Titus",
+    /Philem|Phm|Pm/i => "Philemon",
+    /Heb/i => "Hebrews",
+    /Jas|Jm/i => "James",
+    /Pet|Pe|Pt|P/i => "Peter",
+    /Jud|Jd/i => "Jude",
+    /Rev|Re/i => "Revelation"
+}
+
 
 def sort_child_hash_by_key(hash)
     return hash.map do |key, value| 
@@ -64,6 +120,11 @@ class BibleTwitter
     end
     
     def self.expandAcronym(bookAcronym)
+        $BIBLE_ACRONYMS.each do |regex, returnString|
+            if (bookAcronym =~ /\A#{regex}\z/i)
+                return returnString
+            end
+        end
         return bookAcronym
     end
     
@@ -104,6 +165,7 @@ class BibleTwitter
                        else
                             "#{search[:book_num]} #{search[:book]}"
                        end
+            bookName = BibleTwitter::cleanBookName(bookName)
             chapterName = search[:chapter].to_i
             verseName = search[:verse].to_i
             if db[bookName].nil?
